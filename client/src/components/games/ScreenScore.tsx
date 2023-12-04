@@ -1,8 +1,8 @@
 
-const ScoreTheGoal = () => {
+const ScreenScore = () => {
   return (
-    <div>ScoreTheGoal</div>
+    <div>ScreenScore</div>
   )
 }
 
-export default ScoreTheGoal
+export default ScreenScore
