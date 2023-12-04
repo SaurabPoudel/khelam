@@ -1,13 +1,16 @@
 import { Route, Routes } from "react-router-dom"
 import Home from "./components/Home"
-import ScoreTheGoal from "./components/games/ScoreTheGoal"
+import GameRoom from "./components/GameRoom"
+import GameMenu from "./components/games/GameMenu"
 
 const App = () => {
   return (
     <div className="">
     <Routes>
    <Route path="/" element={<Home/>} />
-   <Route path="/score-the-goal" element={<ScoreTheGoal/>}/>
+   <Route path="/:id" element={<GameRoom/>} >
+   <Route index element={<GameMenu/>}/>
+   </Route>
     </Routes>
     </div>
   )
