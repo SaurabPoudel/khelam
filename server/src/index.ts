@@ -1,21 +1,38 @@
-import express,{ Express, Request , Response} from "express";
-import dotenv from 'dotenv';
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import dotenv from "dotenv";
 
 dotenv.config();
+const PORT = process.env.PORT || 3000;
+const app = express();
+app.use(cors());
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
-const port = process.env.PORT;
+io.on("connection", (socket) => {
+  console.log("a user connected");
 
-const app: Express = express();
+  socket.on("join room", (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room ${roomId}`);
+  });
 
-app.get('/',(req: Request, res: Response)=>{
-  res.send("game room server");
-})
+  socket.on("chat message", (roomId, msg) => {
+    io.to(roomId).emit("chat message", msg);
+  });
 
-app.listen(port,()=>{
-  console.log(`😝[server]: Server is running at http://localhost:${port}`)
-})
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
 
-
-
-
-
+httpServer.listen(PORT, () => {
+  console.log(`Server is listening  http://localhost:${PORT} 😝`);
+});
