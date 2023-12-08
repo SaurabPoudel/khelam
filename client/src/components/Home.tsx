@@ -1,12 +1,12 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
+import { useUser } from "../contexts/UserContext";
 const Home = () => {
-  const [room, setRoom] = useState("");
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
   const handleJoinRoom = () => {
-    socket.emit("join room", room);
-    navigate(room);
+    socket.emit("join room", user);
+    navigate(user?.room || "");
   };
   return (
     <section className="h-screen flex justify-center items-center">
@@ -22,12 +22,20 @@ const Home = () => {
           onSubmit={() => handleJoinRoom()}
           className="flex flex-col w-full items-center"
         >
-          <div className="flex w-full justify-center gap-2 items-center`">
+          <div className="flex flex-col w-full gap-2 items-center">
+            <input
+              className="w-1/2 text-black py-2 px-1 rounded-sm"
+              placeholder="Enter username  ..."
+              value={user?.username || ""}
+              onChange={(e) =>
+                setUser?.({ ...user!, username: e.target.value })
+              }
+            />
             <input
               className="w-1/2 text-black py-2 px-1 rounded-sm"
               placeholder="Drop Room code here ..."
-              value={room}
-              onChange={(e) => setRoom(e.target.value)}
+              value={user?.room || ""}
+              onChange={(e) => setUser({ ...user!, room: e.target.value })}
             />
           </div>
           <div className="flex  w-full justify-center">

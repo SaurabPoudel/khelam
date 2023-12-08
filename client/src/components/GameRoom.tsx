@@ -1,28 +1,50 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 import { useEffect, useState } from "react";
+import { useUser } from "../contexts/UserContext";
 
+interface Message {
+  message: string;
+  username: string;
+}
 const GameRoom = () => {
-  const [chats, setChats] = useState([""]);
+  const [chats, setChats] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
+  const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const gameRoom = location.pathname.slice(1);
   useEffect(() => {
-    socket.on("chat message", (msg: string) => {
-      setChats([...chats, msg]);
-    });
-  }, [chats]);
+    console.log("Mouting the component");
+
+    const handleChatMessage = (msg: Message) => {
+      console.log("Received chat message:", msg);
+      setChats((prevMessage) => [...prevMessage, msg]);
+    };
+
+    socket.on("chat message", handleChatMessage);
+
+    return () => {
+      socket.off("chat message", handleChatMessage);
+    };
+  }, []);
+  console.log(chats);
   const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    socket.emit("chat message", gameRoom, message);
-    setMessage("");
-    console.log(message);
+    if (message.trim() !== "") {
+      socket.emit("chat message", {
+        message: message,
+        username: user?.username,
+      });
+      setMessage("");
+    }
   };
   const handleLeaveRoom = () => {
     socket.disconnect();
     navigate("/");
   };
+  if (!user) return null;
+
   return (
     <div className="text-green-500 flex justify-center items-center h-screen">
       <div className="top-0 right-0 w-[300px] h-[200px] bg-green-500 absolute text-black z-40">
@@ -34,7 +56,8 @@ const GameRoom = () => {
         <div className="flex flex-col gap-4">
           {chats.map((chat, index) => (
             <div className="text-white flex flex-row gap-4" key={index}>
-              <span>{chat} </span>
+              <span>{chat.username}:</span>
+              <span>{chat.message}</span>
             </div>
           ))}
         </div>
@@ -53,7 +76,10 @@ const GameRoom = () => {
         Player two
       </div>
       <div className="absolute bottom-0 left-1/2 pb-3 flex">
-        <span className="pr-3 text-xl text-green-500 pt-2"> GameRoom:</span>
+        <span className="pr-3 text-xl text-green-500 pt-2">
+          {" "}
+          {user.username}:
+        </span>
         <span className="pr-5 text-xl text-white pt-2"> {gameRoom}</span>
         <button
           className="text-white bg-red-500 py-2 px-3 rounded-lg"

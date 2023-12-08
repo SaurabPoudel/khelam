@@ -1,6 +1,6 @@
 import express from "express";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -9,6 +9,14 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 const httpServer = createServer(app);
+
+interface User {
+  username: string;
+  room: string;
+}
+
+const activeUsers: Record<string, User> = {};
+
 const io = new Server(httpServer, {
   cors: {
     origin: "http://localhost:5173",
@@ -16,20 +24,31 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   console.log("a user connected");
 
-  socket.on("join room", (roomId) => {
-    socket.join(roomId);
-    console.log(`User joined room ${roomId}`);
+  socket.on("join room", ({ room, username }: User) => {
+    socket.join(room);
+    activeUsers[socket.id] = { username, room };
+    console.log(`${username} joined room ${room}`);
   });
 
-  socket.on("chat message", (roomId, msg) => {
-    io.to(roomId).emit("chat message", msg);
+  socket.on("chat message", (msg: string) => {
+    console.log("Recieved message : ", msg);
+    const user = activeUsers[socket.id];
+    const room = user.room;
+    io.to(room).emit("chat message", {
+      message: msg.message,
+      username: user.username,
+    });
   });
-
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    const user = activeUsers[socket.id];
+    if (user) {
+      const { username, room } = user;
+      console.log(`${username} disconnected from room: ${room}`);
+      delete activeUsers[socket.id];
+    }
   });
 });
 
