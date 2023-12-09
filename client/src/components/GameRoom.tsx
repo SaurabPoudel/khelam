@@ -52,7 +52,7 @@ const GameRoom = () => {
         Player one{" "}
       </div>
       <Outlet />
-      <div className="right-0 top-1/4  text-white  pb-4  w-[16vw] h-3/4  absolute overflow-y-auto">
+      <div className="right-0   top-1/4  text-white  pb-4  w-[16vw] h-3/4  absolute overflow-y-auto">
         <div className="flex flex-col gap-4">
           {chats.map((chat, index) => (
             <div className="text-white flex flex-row gap-4" key={index}>

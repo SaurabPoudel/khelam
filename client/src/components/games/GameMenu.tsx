@@ -11,14 +11,13 @@ const games = [
 const GameMenu = () => {
   const router = useNavigate();
   return (
-    <div className="flex flex-col text-green-500 border-2 border-gray-400 w-2/3 rounded-xl px-4">
+  <div className="flex flex-col text-green-500 border-2 border-gray-400 w-2/3 rounded-xl px-4">
       <h1 className="text-center text-2xl"> Choose your game</h1>
       <div className="flex flex-row">
         {games.map((game) => (
           <div className="pb-4" key={game.id}>
             <div className="text-center"> {game.name}</div>
-            <img
-              src={game.imageUrl}
+            <img src={game.imageUrl}
               width="250px"
               height="350px"
               className="mb-3 border-gray-400 border-2 rounded"

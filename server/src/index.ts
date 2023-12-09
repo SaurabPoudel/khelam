@@ -14,7 +14,16 @@ interface User {
   username: string;
   room: string;
 }
-
+interface Message {
+  message: string;
+}
+interface CallData {
+  userToCall: string;
+  signalData: string;
+  from: string;
+  to: string;
+  name: string;
+}
 const activeUsers: Record<string, User> = {};
 
 const io = new Server(httpServer, {
@@ -32,8 +41,19 @@ io.on("connection", (socket: Socket) => {
     activeUsers[socket.id] = { username, room };
     console.log(`${username} joined room ${room}`);
   });
+  socket.on("request call", (data: CallData) => {
+    io.to(data.userToCall).emit("requestCall", {
+      signal: data.signalData,
+      from: data.from,
+      name: data.name,
+    });
+  });
 
-  socket.on("chat message", (msg: string) => {
+  socket.on("accept call", (data: CallData) => {
+    io.to(data.to).emit("call accepted", { signal: data.signalData });
+  });
+
+  socket.on("chat message", (msg: Message) => {
     console.log("Recieved message : ", msg);
     const user = activeUsers[socket.id];
     const room = user.room;
