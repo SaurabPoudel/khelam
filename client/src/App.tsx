@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import GameRoom from "./components/GameRoom";
 import GameMenu from "./components/games/GameMenu";
-import ScreenScore from "./components/games/ScreenScore";
+import ScreenScore from "./components/games/screen-score/ScreenScore";
 
 const App = () => {
   return (

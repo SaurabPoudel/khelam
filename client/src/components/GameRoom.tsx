@@ -46,7 +46,7 @@ const GameRoom = () => {
   if (!user) return null;
 
   return (
-    <div className="text-green-500 flex justify-center items-center h-screen">
+        <div className="text-green-500 flex justify-center items-center h-screen">
       <div className="top-0 right-0 w-[300px] h-[200px] bg-green-500 absolute text-black z-40">
         {" "}
         Player one{" "}
